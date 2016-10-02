@@ -4,6 +4,7 @@ data:extend({
         name = "shuttleTrain",
         icon = "__ShuttleTrain__/graphics/icon_shuttleTrain.png",
         flags = {"placeable-neutral", "player-creation", "placeable-off-grid", "not-on-map"},
+        is_shuttle_train = true,
         minable = {mining_time = 1, result = "shuttleTrain"},
         mined_sound = {filename = "__core__/sound/deconstruct-medium.ogg"},
         max_health = 1000,

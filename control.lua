@@ -3,6 +3,7 @@ require "util"
 function init()
 	global.trainStations = global.trainStations or game.surfaces[1].find_entities_filtered{area = {{-10000,-10000}, {10000,10000}}, type="train-stop"} or {}
 	global.shuttleTrains = global.shuttleTrains or game.surfaces[1].find_entities_filtered{area = {{-10000,-10000}, {10000,10000}}, name="shuttleTrain"} or {}
+        global.shuttlePrototypes = global.shuttlePrototypes or {}
     load()
 end
 
@@ -15,6 +16,7 @@ function load()
     global.trainStations = global.trainStations or {}
     global.shuttleTrains = global.shuttleTrains or {}
     global.force_shuttle_call_GUI_update = true;
+    global.shuttlePrototypes = global.shuttlePrototypes or {}
 end
 
 script.on_init(init)
@@ -54,6 +56,17 @@ script.on_event(defines.events.on_train_changed_state, function(event)
     end
 end)
 
+function register_shuttle_prototype(prototype_name)
+    assert(type(prototype_name) == "string", "Pass in a prototype *name*")
+    local prototype = game.entity_prototypes[prototype_name]
+    assert(prototype, string.format("%s is not a valid entity prototype", prototype_name))
+    global.shuttlePrototypes[prototype.name] = prototype.name
+end
+
+remote.add_interface("ShuttleTrain", {
+    ["register_shuttle_prototype"] = register_shuttle_prototype,
+})
+
 function anyFrontMoverIsShuttle(front_movers)
     for _, loco in pairs(front_movers)do
         if isShuttle(loco) then
@@ -64,11 +77,7 @@ function anyFrontMoverIsShuttle(front_movers)
 end
 
 function isShuttle(locomotive)
-    if locomotive.name == "shuttleTrain" then
-        return true
-    else
-        return false
-    end
+    return global.shuttlePrototypes[locomotive.prototype.name] ~= nil
 end
 
 function UpdateShuttleCallButton(player)
